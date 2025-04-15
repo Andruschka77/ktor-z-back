@@ -1,12 +1,12 @@
 package com.example.data.model
 
-data class UserModel(
-    val id: Int,
-    val email: String,
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class FriendModel(
+    val id: String,
     val login: String,
-    val password: String,
     val firstName: String,
     val lastName: String,
-    val isActive: Boolean= false,
     val coordinates: String
 )

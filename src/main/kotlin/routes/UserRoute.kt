@@ -10,7 +10,6 @@ import com.example.domain.usecase.UserUseCase
 import com.example.utils.Constants
 import io.ktor.http.*
 import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -33,7 +32,8 @@ fun Route.UserRoute(userUseCase: UserUseCase) {
                 login = registerRequest.login.trim().lowercase(),
                 password = hashFunction(registerRequest.password.trim()),
                 firstName = registerRequest.firstName.trim(),
-                lastName = registerRequest.lastName.trim()
+                lastName = registerRequest.lastName.trim(),
+                coordinates = registerRequest.coordinates
             )
 
             userUseCase.createUser(user)
@@ -69,8 +69,9 @@ fun Route.UserRoute(userUseCase: UserUseCase) {
     authenticate("jwt") {
         get("api/v1/profile") {
             try {
-                val principal = call.principal<JWTPrincipal>()
-                val email = principal?.payload?.getClaim("email")?.asString()
+                val principal = call.principal<UserModel>()
+                val email = principal?.email
+
 
                 if (email.isNullOrEmpty()) {
                     call.respond(HttpStatusCode.Unauthorized, BaseResponse(false, Constants.Error.GENERAL))
@@ -100,5 +101,4 @@ fun Route.UserRoute(userUseCase: UserUseCase) {
             }
         }
     }
-
 }

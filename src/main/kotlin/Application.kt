@@ -1,7 +1,9 @@
 package com.example
 
 import com.example.authentification.JwtService
+import com.example.data.repository.FriendRepositoryImpl
 import com.example.data.repository.UserRepositoryImpl
+import com.example.domain.usecase.FriendUseCase
 import com.example.domain.usecase.UserUseCase
 import com.example.plugins.DatabaseFactory.initializationDatabase
 import com.example.plugins.configureMonitoring
@@ -20,11 +22,13 @@ fun main() {
 fun Application.module() {
     val jwtService = JwtService()
     val UserRepository = UserRepositoryImpl()
+    val FriendRepository = FriendRepositoryImpl()
     val userUseCase = UserUseCase(UserRepository, jwtService)
+    val friendUseCase = FriendUseCase(FriendRepository)
 
     initializationDatabase()
     configureMonitoring()
     configureSerialization()
     configureSecurity(userUseCase)
-    configureRouting(userUseCase)
+    configureRouting(userUseCase, friendUseCase)
 }
