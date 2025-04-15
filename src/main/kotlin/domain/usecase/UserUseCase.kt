@@ -9,7 +9,6 @@ class UserUseCase(
     private val repositoryImpl: UserRepositoryImpl,
     private val jwtService: JwtService
 ) {
-
     suspend fun createUser(userModel: UserModel) = repositoryImpl.insertUser(userModel = userModel)
 
     suspend fun findUserByEmail(email: String) = repositoryImpl.getUserByEmail(email = email)
