@@ -3,11 +3,9 @@ package com.example.data.model.requests
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RegisterRequest(
-    val email: String,
-    val login: String,
-    val password: String,
+data class ProfileRequest(
     val firstName: String,
     val lastName: String,
-    val isActive: Boolean = false
+    val login: String,
+    val email: String
 )

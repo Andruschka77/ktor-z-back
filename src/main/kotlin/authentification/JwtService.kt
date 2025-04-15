@@ -4,8 +4,6 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.example.data.model.UserModel
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 
 class JwtService {
     private val issuer = "z-server"
@@ -22,7 +20,6 @@ class JwtService {
             .withSubject("ZAppAuthentication")
             .withIssuer(issuer)
             .withClaim("email", user.email)
-            //.withExpiresAt(LocalDateTime.now().plusDays(1).toInstant(ZoneOffset.UTC))
             .sign(algorithm)
     }
 
