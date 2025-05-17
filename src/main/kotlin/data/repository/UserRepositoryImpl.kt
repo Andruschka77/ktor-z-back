@@ -1,12 +1,14 @@
 package com.example.data.repository
 
+import com.example.data.model.FriendModel
 import com.example.data.model.UserModel
+import com.example.data.model.requests.FriendRequest
+import com.example.data.model.tables.FriendTable
 import com.example.data.model.tables.UserTable
 import com.example.domain.repository.UserRepository
 import com.example.plugins.DatabaseFactory.dbQuery
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 class UserRepositoryImpl: UserRepository {
 
@@ -27,6 +29,7 @@ class UserRepositoryImpl: UserRepository {
                 table[firstName] = userModel.firstName
                 table[lastName] = userModel.lastName
                 table[isActive] = userModel.isActive
+                table[coordinates] = userModel.coordinates
             }
         }
     }
@@ -42,7 +45,12 @@ class UserRepositoryImpl: UserRepository {
             password = row[UserTable.password],
             firstName = row[UserTable.firstName],
             lastName = row[UserTable.lastName],
-            isActive = row[UserTable.isActive]
+            isActive = row[UserTable.isActive],
+            coordinates = row[UserTable.coordinates] ?: ""
         )
+    }
+
+    override suspend fun existsByLogin(login: String): Boolean = dbQuery {
+        UserTable.select { UserTable.login eq login }.count() > 0
     }
 }

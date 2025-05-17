@@ -33,7 +33,8 @@ fun Route.UserRoute(userUseCase: UserUseCase) {
                 login = registerRequest.login.trim().lowercase(),
                 password = hashFunction(registerRequest.password.trim()),
                 firstName = registerRequest.firstName.trim(),
-                lastName = registerRequest.lastName.trim()
+                lastName = registerRequest.lastName.trim(),
+                coordinates = registerRequest.coordinates
             )
 
             userUseCase.createUser(user)

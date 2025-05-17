@@ -8,4 +8,5 @@ interface UserRepository {
 
     suspend fun insertUser(userModel: UserModel)
 
+    suspend fun existsByLogin(login: String): Boolean
 }
