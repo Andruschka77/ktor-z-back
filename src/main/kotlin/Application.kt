@@ -24,7 +24,7 @@ fun Application.module() {
     val UserRepository = UserRepositoryImpl()
     val FriendRepository = FriendRepositoryImpl()
     val userUseCase = UserUseCase(UserRepository, jwtService)
-    val friendUseCase = FriendUseCase(FriendRepository)
+    val friendUseCase = FriendUseCase(FriendRepository, UserRepository)
 
     initializationDatabase()
     configureMonitoring()

@@ -20,6 +20,7 @@ class JwtService {
             .withSubject("ZAppAuthentication")
             .withIssuer(issuer)
             .withClaim("email", user.email)
+            .withClaim("login", user.login)
             .sign(algorithm)
     }
 

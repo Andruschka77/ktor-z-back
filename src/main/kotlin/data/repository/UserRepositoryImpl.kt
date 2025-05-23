@@ -53,4 +53,12 @@ class UserRepositoryImpl: UserRepository {
     override suspend fun existsByLogin(login: String): Boolean = dbQuery {
         UserTable.select { UserTable.login eq login }.count() > 0
     }
+
+    override suspend fun getUserCoordinates(login: String): String = dbQuery {
+        UserTable
+            .slice(UserTable.coordinates)
+            .select { UserTable.login eq login }
+            .singleOrNull()
+            ?.get(UserTable.coordinates) ?: ""
+    }
 }

@@ -9,4 +9,6 @@ interface UserRepository {
     suspend fun insertUser(userModel: UserModel)
 
     suspend fun existsByLogin(login: String): Boolean
+
+    suspend fun getUserCoordinates(login: String): String
 }

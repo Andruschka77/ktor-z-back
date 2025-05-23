@@ -10,6 +10,7 @@ import com.example.domain.usecase.UserUseCase
 import com.example.utils.Constants
 import io.ktor.http.*
 import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -69,9 +70,8 @@ fun Route.UserRoute(userUseCase: UserUseCase) {
     authenticate("jwt") {
         get("api/v1/profile") {
             try {
-                val principal = call.principal<UserModel>()
-                val email = principal?.email
-
+                val principal = call.principal<JWTPrincipal>()
+                val email = principal?.payload?.getClaim("email")?.asString()
 
                 if (email.isNullOrEmpty()) {
                     call.respond(HttpStatusCode.Unauthorized, BaseResponse(false, Constants.Error.GENERAL))

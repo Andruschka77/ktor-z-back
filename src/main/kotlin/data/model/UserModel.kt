@@ -7,6 +7,6 @@ data class UserModel(
     val password: String,
     val firstName: String,
     val lastName: String,
-    val isActive: Boolean= false,
+    val isActive: Boolean = false,
     val coordinates: String
 )
