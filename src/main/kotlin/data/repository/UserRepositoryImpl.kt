@@ -1,14 +1,10 @@
 package com.example.data.repository
 
-import com.example.data.model.FriendModel
 import com.example.data.model.UserModel
-import com.example.data.model.requests.FriendRequest
-import com.example.data.model.tables.FriendTable
 import com.example.data.model.tables.UserTable
 import com.example.domain.repository.UserRepository
 import com.example.plugins.DatabaseFactory.dbQuery
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 class UserRepositoryImpl: UserRepository {
 

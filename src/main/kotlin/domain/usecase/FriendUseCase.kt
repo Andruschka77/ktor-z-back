@@ -1,9 +1,8 @@
 package com.example.domain.usecase
 
 import com.example.domain.repository.FriendRepository
-import com.example.domain.repository.UserRepository
 
-class FriendUseCase(private val friendRepository: FriendRepository, private val userRepository: UserRepository) {
+class FriendUseCase(private val friendRepository: FriendRepository) {
     suspend fun sendRequest(senderLogin: String, receiverLogin: String): Boolean {
         if (senderLogin == receiverLogin) throw IllegalArgumentException("Нельзя отправить запрос себе")
         return friendRepository.sendRequest(senderLogin, receiverLogin)

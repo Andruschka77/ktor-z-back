@@ -2,7 +2,6 @@ package com.example.data.model.tables
 
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.substring
 
 object FriendTable : Table(name = "friend_table") {
     val id: Column<Int> = integer("id").autoIncrement()

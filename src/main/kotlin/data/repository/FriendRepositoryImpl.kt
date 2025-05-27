@@ -9,7 +9,6 @@ import com.example.plugins.DatabaseFactory.dbQuery
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.like
-import org.jetbrains.exposed.sql.transactions.transaction
 
 class FriendRepositoryImpl : FriendRepository {
 
@@ -38,12 +37,18 @@ class FriendRepositoryImpl : FriendRepository {
         }.firstOrNull() ?: return@dbQuery false
 
         if (accept) {
-            listOf(senderLogin, receiverLogin).forEach { login ->
+            val senderCoords = UserTable.select { UserTable.login eq senderLogin }
+                .firstOrNull()?.get(UserTable.coordinates) ?: return@dbQuery false
+            val receiverCoords = UserTable.select { UserTable.login eq receiverLogin }
+                .firstOrNull()?.get(UserTable.coordinates) ?: return@dbQuery false
+
+            listOf(
+                senderLogin to "$receiverLogin|$receiverCoords",
+                receiverLogin to "$senderLogin|$senderCoords"
+            ).forEach { (login, data) ->
                 FriendTable.insert {
                     it[login_sender_receiver] = login
-                    //
-                    it[coordinates] = "ACCEPTED:${if (login == senderLogin) receiverLogin else senderLogin}"
-                    // (UserTable.login eq senderLogin) UserTable.coordinates
+                    it[coordinates] = data
                     it[status] = true
                 }
             }
@@ -57,18 +62,20 @@ class FriendRepositoryImpl : FriendRepository {
     // Получение друзей
     override suspend fun getFriends(userLogin: String): List<FriendModel> = dbQuery {
         FriendTable.select {
-            (FriendTable.coordinates like "ACCEPTED:%") and
-                    (FriendTable.login_sender_receiver eq userLogin) and
+            (FriendTable.login_sender_receiver eq userLogin) and
                     (FriendTable.status eq true)
         }.map { row ->
-            val friendLogin = row[FriendTable.coordinates].substringAfter("ACCEPTED:")
-            UserTable.select { UserTable.login eq friendLogin }.first().let {
+            val parts = row[FriendTable.coordinates].split("|")
+            val friendLogin = parts.getOrElse(0) { "" }
+            val friendCoordinates = parts.getOrElse(1) { "" }
+
+            UserTable.select { UserTable.login eq friendLogin }.first().let { userRow ->
                 FriendModel(
                     id = row[FriendTable.id].toString(),
                     login = friendLogin,
-                    firstName = it[UserTable.firstName],
-                    lastName = it[UserTable.lastName],
-                    coordinates = it[UserTable.coordinates] ?: ""
+                    firstName = userRow[UserTable.firstName],
+                    lastName = userRow[UserTable.lastName],
+                    coordinates = friendCoordinates
                 )
             }
         }
@@ -76,10 +83,15 @@ class FriendRepositoryImpl : FriendRepository {
 
     // Удаление друга
     override suspend fun removeFriend(userLogin: String, friendLogin: String): Boolean = dbQuery {
-        FriendTable.deleteWhere {
+        val deleteCurrentUser = FriendTable.deleteWhere {
             (login_sender_receiver eq userLogin) and
-                    (coordinates like "ACCEPTED:$friendLogin|%")
-        } > 0
+                    (coordinates like "$friendLogin|%")
+        }
+        val deleteFriend = FriendTable.deleteWhere {
+            (login_sender_receiver eq friendLogin) and
+                    (coordinates like "$userLogin|%")
+        }
+        (deleteCurrentUser > 0) || (deleteFriend > 0)
     }
 
     // Получение списка запросов в друзья
